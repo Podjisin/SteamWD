@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+docs/_build/
+
+# Build
+build/
+dist/
+*.spec
+
+# steamcmd runtime data (the exe itself is re-downloaded if missing)
+steamcmd/
+steamcmd.exe
+steamapps/
+logs/
+*.log
+
+# Editors
+.vscode/
+.idea/

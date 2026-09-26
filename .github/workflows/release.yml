@@ -1,0 +1,96 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ".[dev]"
+
+      - name: Run tests
+        shell: pwsh
+        run: python -m pytest
+
+      - name: Build executable
+        shell: pwsh
+        run: ./scripts/build.ps1
+
+      - name: Create checksum
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash -Algorithm SHA256 -Path "dist\SteamWD.exe").Hash.ToLowerInvariant()
+          "$hash  SteamWD.exe" | Set-Content -NoNewline -Encoding ascii "dist\SHA256SUMS.txt"
+
+      - name: Scan with VirusTotal
+        if: ${{ env.VIRUSTOTAL_API_KEY != '' }}
+        shell: pwsh
+        run: |
+          $headers = @{ "x-apikey" = $env:VIRUSTOTAL_API_KEY }
+          $file = Get-Item "dist\SteamWD.exe"
+          $uploadUrl = "https://www.virustotal.com/api/v3/files"
+          if ($file.Length -gt 32MB) {
+            $uploadUrl = (Invoke-RestMethod `
+              -Method Get `
+              -Uri "https://www.virustotal.com/api/v3/files/upload_url" `
+              -Headers $headers).data
+          }
+          $upload = Invoke-RestMethod `
+            -Method Post `
+            -Uri $uploadUrl `
+            -Headers $headers `
+            -Form @{ file = $file }
+          $analysisId = $upload.data.id
+
+          $analysis = $null
+          for ($attempt = 0; $attempt -lt 30; $attempt++) {
+            Start-Sleep -Seconds 10
+            $analysis = Invoke-RestMethod `
+              -Method Get `
+              -Uri "https://www.virustotal.com/api/v3/analyses/$analysisId" `
+              -Headers $headers
+            if ($analysis.data.attributes.status -in @("completed", "failed")) { break }
+          }
+
+          $report = [ordered]@{
+            file = "SteamWD.exe"
+            sha256 = (Get-FileHash -Algorithm SHA256 -Path "dist\SteamWD.exe").Hash.ToLowerInvariant()
+            analysis_url = "https://www.virustotal.com/gui/file-analysis/$analysisId"
+            status = $analysis.data.attributes.status
+            stats = $analysis.data.attributes.stats
+          }
+          $report | ConvertTo-Json -Depth 5 | Set-Content -Encoding utf8 "dist\VIRUSTOTAL.json"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: |
+            dist/SteamWD.exe
+            dist/SHA256SUMS.txt
+
+      - name: Upload VirusTotal report
+        if: ${{ env.VIRUSTOTAL_API_KEY != '' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/VIRUSTOTAL.json
