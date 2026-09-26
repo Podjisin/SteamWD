@@ -6,6 +6,8 @@ originally needed it to download Stellaris mods without dealing with them.
 SteamWD is a Windows desktop app that downloads Steam Workshop items and
 collections through `steamcmd`.
 
+[![Release](https://github.com/Podjisin/SteamWD/actions/workflows/release.yml/badge.svg)](https://github.com/Podjisin/SteamWD/actions/workflows/release.yml)
+
 ## Features
 
 - Download items or collections from Workshop links or IDs
