@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-09-25
+## [0.1.0] - 2026-09-26
 
 ### Added
 - Tkinter GUI with Downloads, Settings and Log tabs, and light and dark themes.
