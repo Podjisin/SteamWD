@@ -113,6 +113,7 @@ def apply_theme(root: tk.Misc, name: str) -> Palette:
     style.configure("TLabelframe", background=p.bg, bordercolor=p.border)
     style.configure("TLabelframe.Label", background=p.bg, foreground=p.fg, font=("Segoe UI", 10, "bold"))
     style.configure("Muted.TLabel", foreground=p.muted)
+    style.configure("Link.TLabel", foreground=p.accent)
     style.configure("Horizontal.TProgressbar", background=p.accent, troughcolor=p.field_bg, bordercolor=p.border)
     style.configure("TScrollbar", background=p.button_bg, troughcolor=p.bg, arrowcolor=p.fg, bordercolor=p.bg)
 

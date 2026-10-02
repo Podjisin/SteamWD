@@ -59,6 +59,22 @@ def test_serialized_settings_contain_no_secret_fields() -> None:
     assert not {k for k in keys if "password" in k or "key" in k or "token" in k}
 
 
+def test_stellaris_mod_directory_round_trips(tmp_path: Path) -> None:
+    settings = Settings(stellaris_mod_dir=str(tmp_path / "mod"))
+    loaded, warnings = settings_from_dict(settings_to_dict(settings))
+
+    assert loaded.stellaris_mod_dir == settings.stellaris_mod_dir
+    assert warnings == []
+
+
+def test_rimworld_mod_directory_round_trips(tmp_path: Path) -> None:
+    settings = Settings(rimworld_mod_dir=str(tmp_path / "Mods"))
+    loaded, warnings = settings_from_dict(settings_to_dict(settings))
+
+    assert loaded.rimworld_mod_dir == settings.rimworld_mod_dir
+    assert warnings == []
+
+
 def test_export_and_import(tmp_path: Path) -> None:
     path = tmp_path / "export.json"
     export_settings(path, Settings(batch_size=3))

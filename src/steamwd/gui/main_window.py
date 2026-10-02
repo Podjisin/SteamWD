@@ -3,6 +3,7 @@ from tkinter import ttk
 from typing import TYPE_CHECKING
 
 from steamwd.gui.download_view import DownloadView
+from steamwd.gui.info_view import InfoView
 from steamwd.gui.log_view import LogView
 from steamwd.gui.settings_view import SettingsView
 from steamwd.gui.theme import apply_theme
@@ -23,9 +24,11 @@ class MainWindow(ttk.Frame):
         self.downloads = DownloadView(self.notebook, controller)
         self.settings = SettingsView(self.notebook, controller)
         self.log = LogView(self.notebook, controller)
+        self.info_page = InfoView(self.notebook)
         self.notebook.add(self.downloads, text="Downloads")
         self.notebook.add(self.settings, text="Settings")
         self.notebook.add(self.log, text="Log")
+        self.notebook.add(self.info_page, text="Info")
 
     def apply_theme(self, name: str) -> None:
         """Switch between light and dark themes."""
@@ -33,3 +36,4 @@ class MainWindow(ttk.Frame):
         self.downloads.apply_palette(palette)
         self.settings.apply_palette(palette)
         self.log.apply_palette(palette)
+        self.info_page.apply_palette(palette)

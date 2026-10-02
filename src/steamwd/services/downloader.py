@@ -14,6 +14,7 @@ from steamwd.core.naming import render_folder_name, sanitize_filename
 from steamwd.core.steamcmd_output import DownloadProgress, ItemDownloaded, ItemFailed, LoginFailed
 from steamwd.errors import LoginError, SteamCmdError, SteamWDError
 from steamwd.logging_setup import Redactor
+from steamwd.processors import processor_for
 from steamwd.services import files
 from steamwd.services.history import DownloadHistory
 from steamwd.services.steam_api import COLLECTION_FILE_TYPE
@@ -325,12 +326,16 @@ class DownloadManager:
             )
         try:
             mode = self._settings.transfer_mode
-            if mode == "leave":
-                destination = source
-            else:
-                destination = files.transfer(source, self._destination(job), mode)
-                if mode == "copy" and self._settings.clear_cache_after_copy:
-                    files.remove_tree(source)
+            item = WorkshopItem(
+                item_id=job.item_id,
+                title=job.title,
+                app_id=app_id,
+                file_size=job.file_size,
+                time_updated=job.time_updated,
+            )
+            destination = processor_for(app_id).process(source, item, self._settings, self._destination(job))
+            if mode == "copy" and self._settings.clear_cache_after_copy and destination != source:
+                files.remove_tree(source)
         except OSError as exc:
             self._update(job, JobStatus.FAILED, f"Downloaded, but could not place files: {exc}")
             return False

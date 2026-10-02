@@ -39,7 +39,9 @@ RANGES: dict[str, tuple[int, int]] = {
     "api_timeout_seconds": (5, 300),
 }
 
-PATH_FIELDS = frozenset({"steamcmd_path", "cache_dir", "output_dir", "log_dir"})
+PATH_FIELDS = frozenset(
+    {"steamcmd_path", "cache_dir", "output_dir", "stellaris_mod_dir", "rimworld_mod_dir", "log_dir"}
+)
 
 NAMING_PRESETS = ("{title}", "{id} - {title}", "{title} ({id})", "{id}", "{game} - {title}")
 
@@ -57,6 +59,8 @@ class Settings:
 
     # Output
     output_dir: str = field(default_factory=lambda: str(paths.default_output_dir()))
+    stellaris_mod_dir: str = field(default_factory=lambda: str(paths.default_stellaris_mod_dir()))
+    rimworld_mod_dir: str = field(default_factory=lambda: str(paths.default_rimworld_mod_dir()))
     transfer_mode: str = "copy"
     clear_cache_after_copy: bool = True
     group_by: str = "none"

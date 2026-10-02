@@ -10,6 +10,8 @@ __all__ = [
     "default_cache_dir",
     "default_log_dir",
     "default_output_dir",
+    "default_stellaris_mod_dir",
+    "default_rimworld_mod_dir",
     "default_steamcmd_path",
     "history_file",
     "settings_file",
@@ -58,3 +60,13 @@ def default_cache_dir() -> Path:
 def default_output_dir() -> Path:
     """Default folder for finished downloads."""
     return Path.home() / "Downloads" / APP_DIR_NAME
+
+
+def default_stellaris_mod_dir() -> Path:
+    """Default Stellaris user Workshop mod folder."""
+    return Path.home() / "Documents" / "Paradox Interactive" / "Stellaris" / "mod"
+
+
+def default_rimworld_mod_dir() -> Path:
+    """Default RimWorld user mod folder."""
+    return Path.home() / "AppData" / "LocalLow" / "Ludeon Studios" / "RimWorld by Ludeon Studios" / "Mods"

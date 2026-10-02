@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from steamwd.core.models import DownloadJob, JobStatus, workshop_url
 from steamwd.gui.theme import Palette, style_text_widget
 from steamwd.gui.widgets import format_size
+from steamwd.processors import processor_name
 
 if TYPE_CHECKING:
     from steamwd.controller import Controller
@@ -16,6 +17,7 @@ __all__ = ["DownloadView"]
 _COLUMNS = (
     ("item_id", "ID", 110, False),
     ("app_id", "App", 70, False),
+    ("processor", "Processor", 105, False),
     ("size", "Size", 80, False),
     ("status", "Status", 100, False),
     ("progress", "Progress", 85, False),
@@ -121,6 +123,7 @@ class DownloadView(ttk.Frame):
         values = (
             job.item_id,
             job.app_id or "",
+            processor_name(job.app_id) if job.app_id else "--",
             format_size(job.file_size),
             job.status.value,
             f"{job.progress}%" if job.progress is not None else "--",

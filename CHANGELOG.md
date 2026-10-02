@@ -2,6 +2,21 @@
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-02
+
+### Added
+- Automatic game-specific mod processors with a generic fallback for unsupported games.
+- Stellaris processing for the user `mod` folder, including generated `.mod` descriptors.
+- RimWorld processing for the user `Mods` folder while preserving `About\About.xml` metadata.
+- Supported Games settings view with configurable processor destinations.
+- Processor names in the download queue so automatic routing is visible.
+- Info tab with GitHub, issue reporting, contribution, and license links.
+- Contributor guide for creating game processor modules.
+
+### Fixed
+- Wrapped long processor destination paths in the Supported Games settings section.
+- Stellaris launcher descriptors now preserve metadata from the downloaded `descriptor.mod`.
+
 ## [0.1.0] - 2026-09-26
 
 ### Added

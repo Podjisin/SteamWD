@@ -20,6 +20,8 @@ collections through `steamcmd`.
 - Choose the output folder, naming format, grouping, and transfer mode
 - Keep download history and clean the `steamcmd` cache
 - Use light or dark mode
+- Process supported games with built-in mod processors, including Stellaris
+- Process RimWorld mods into its user `Mods` folder automatically
 
 ## Using SteamWD
 
@@ -33,6 +35,22 @@ SteamWD downloads `steamcmd` automatically the first time it needs it.
 
 Files are saved to `Downloads\SteamWD` by default. The output location and
 other options can be changed in the Settings tab.
+
+SteamWD uses a generic folder processor for most games. Supported games can
+have a built-in processor that prepares their files for the game. Stellaris
+downloads are placed in `%USERPROFILE%\Documents\Paradox Interactive\Stellaris\mod`
+by default, and SteamWD creates the `.mod` descriptor required by Stellaris.
+The destination can be changed under **Settings > Output > Stellaris mod
+folder**.
+
+RimWorld downloads are placed in `%USERPROFILE%\AppData\LocalLow\Ludeon Studios\RimWorld by
+Ludeon Studios\Mods` by default. RimWorld's existing `About\About.xml` metadata
+is preserved. Both destinations are editable in Settings, and the queue shows
+which processor was selected for each item.
+
+Game processors are maintained in `src/steamwd/processors/`. Contributors can
+add support for another game by implementing the processor interface, adding
+tests, and registering the processor by Steam app ID.
 
 ## Steam account login
 

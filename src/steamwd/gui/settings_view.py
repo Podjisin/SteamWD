@@ -8,6 +8,7 @@ from steamwd.config.settings import CHOICES, NAMING_PRESETS, RANGES, Settings, s
 from steamwd.core.naming import TEMPLATE_FIELDS
 from steamwd.gui.theme import Palette, style_text_widget
 from steamwd.gui.widgets import ScrollableFrame
+from steamwd.processors import supported_processors
 
 if TYPE_CHECKING:
     from steamwd.controller import Controller
@@ -50,6 +51,18 @@ _SECTIONS: tuple[tuple[str, tuple[_Field, ...]], ...] = (
         "Output",
         (
             _Field("output_dir", "Output folder", "dir"),
+            _Field(
+                "stellaris_mod_dir",
+                "Stellaris mod folder",
+                "dir",
+                "Used by the built-in Stellaris processor for app ID 281990.",
+            ),
+            _Field(
+                "rimworld_mod_dir",
+                "RimWorld mod folder",
+                "dir",
+                "Used by the built-in RimWorld processor for app ID 294100.",
+            ),
             _Field("transfer_mode", "After downloading", "choice"),
             _Field("clear_cache_after_copy", "Delete the cached copy after copying", "bool"),
             _Field("group_by", "Group items", "choice"),
@@ -107,6 +120,8 @@ class SettingsView(ttk.Frame):
             frame.columnconfigure(1, weight=1)
             for field_row, spec in enumerate(section_fields):
                 self._build_field(frame, field_row, spec)
+            if title == "Output":
+                self._build_supported_games(frame, len(section_fields))
             if title == "Steam account":
                 self._build_password(frame, len(section_fields))
         self._build_buttons()
@@ -151,6 +166,37 @@ class SettingsView(ttk.Frame):
                 )
         if spec.help:
             ttk.Label(cell, text=spec.help, style="Muted.TLabel").grid(row=1, column=0, columnspan=2, sticky="w")
+
+    def _build_supported_games(self, frame: ttk.LabelFrame, row: int) -> None:
+        """Show the automatic processor routing without adding another form control."""
+        frame.columnconfigure(3, weight=1)
+        ttk.Separator(frame).grid(row=row, column=0, columnspan=2, sticky="ew", pady=(8, 6))
+        ttk.Label(frame, text="Supported games", font=("TkDefaultFont", 9, "bold")).grid(
+            row=row + 1, column=0, columnspan=2, sticky="w", pady=(0, 3)
+        )
+        ttk.Label(
+            frame,
+            text="Workshop items are routed automatically by Steam app ID. Unsupported games use the generic output folder.",
+            style="Muted.TLabel",
+            wraplength=700,
+        ).grid(row=row + 2, column=0, columnspan=2, sticky="w", pady=(0, 5))
+        headers = ("Game", "Steam app", "Processor", "Destination")
+        for column, header in enumerate(headers):
+            ttk.Label(frame, text=header, style="Muted.TLabel").grid(
+                row=row + 3, column=column, sticky="w", padx=(0, 12)
+            )
+        destinations = {281990: "stellaris_mod_dir", 294100: "rimworld_mod_dir"}
+        for offset, (app_id, name) in enumerate(supported_processors(), start=4):
+            ttk.Label(frame, text=name).grid(row=row + offset, column=0, sticky="w", padx=(0, 12))
+            ttk.Label(frame, text=str(app_id)).grid(row=row + offset, column=1, sticky="w", padx=(0, 12))
+            ttk.Label(frame, text=name).grid(row=row + offset, column=2, sticky="w", padx=(0, 12))
+            ttk.Label(
+                frame,
+                textvariable=self._vars[destinations[app_id]],
+                wraplength=280,
+                justify="left",
+                anchor="w",
+            ).grid(row=row + offset, column=3, sticky="ew")
 
     def _build_password(self, frame: ttk.LabelFrame, row: int) -> None:
         ttk.Label(frame, text="Password").grid(row=row, column=0, sticky="nw", padx=(0, 10), pady=3)
